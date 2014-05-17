@@ -19,8 +19,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class ThreadObserver {
     
     protected final List<DataSetFileEntry> data = new ArrayList();
-    private static long bytes_per_thread = Constants.MIN_DATA_SET_BYTES_THREAD;
-    private static long data_set_file_size = 0;
     private AtomicInteger working_threads;
     private int threads_count = 0;
     
@@ -31,17 +29,11 @@ public abstract class ThreadObserver {
             CustomLogger.logAndExit("Dataset file " + _file_path + "does not exist");
         }
         threads_count = _thread_count;
-        data_set_file_size = data_set_file.length();
-        
-        if (threads_count > Math.ceil((double) data_set_file_size / (double) Constants.MIN_DATA_SET_BYTES_THREAD)) {
-            threads_count = (int) Math.ceil(data_set_file_size / Constants.MIN_DATA_SET_BYTES_THREAD);
-        }
-        bytes_per_thread = (int) Math.ceil((double) data_set_file_size / (double) threads_count);
         
         working_threads = new AtomicInteger(threads_count);
         
         for (int i = 0; i < threads_count; i++) {
-            ReaderThread th = new ReaderThread(_file_path, i, bytes_per_thread, this);
+            ReaderThread th = new ReaderThread(_file_path, i, threads_count, this);
             th.execute();
         }
     }

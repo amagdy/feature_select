@@ -25,12 +25,12 @@ public class ReaderThread {
     private ThreadObserver observer = null;
     private int thread_index = 0;
     private String file_path;
-    private long chunk_size = 0;
+    private int thread_count = 0;
     
-    public ReaderThread(String _file_path, int _thread_index, long _chunk_size, ThreadObserver _observer){
+    public ReaderThread(String _file_path, int _thread_index, int _thread_count, ThreadObserver _observer){
         file_path = _file_path;
         thread_index = _thread_index;
-        chunk_size = _chunk_size;
+        thread_count = _thread_count;
         observer = _observer;
     }
     
@@ -46,22 +46,14 @@ public class ReaderThread {
                 } catch (FileNotFoundException ex) {
                     CustomLogger.logAndExit(ex, "Could not open Data set file for reading");
                 }
-                long offset = 0;
-                if (thread_index > 0) {
-                    offset = thread_index * chunk_size;
-                    try {
-                        while (br.ready() && br.read() != 10) offset++;
-                    } catch (IOException ex) {
-                        CustomLogger.log("Error while reading from data set file");
-                    }
-                }
                 
-                long limit = offset + chunk_size;
+                
                 String line = null;
                 try {
-                    while ((line = br.readLine()) != null && offset <= limit) {
-                        class_features.add(DataSetFileEntry.getInstanceByLineString(line));
-                        offset += line.getBytes().length;
+                    int line_number = 0;
+                    while ((line = br.readLine()) != null) {
+                        if ((line_number % thread_count) == thread_index) class_features.add(DataSetFileEntry.getInstanceByLineString(line));
+                        line_number++;
                     }
                 } catch (IOException ex) {
                     CustomLogger.log("Error while reading from data set file");
