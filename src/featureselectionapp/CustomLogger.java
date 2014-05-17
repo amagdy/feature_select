@@ -15,7 +15,7 @@ public class CustomLogger {
     private static PrintStream ps = System.err;
     
     private static void printUsage() {
-        log("Usage: ./feature_select [options] data_set_file [output_file]\n"
+        log("Usage: ./feature_selection_app [options] data_set_file [output_file]\n"
                 + "options:\n"
                 + "-h : to show this help\n"
                 + "-m metric_type : feature selection metric\n"

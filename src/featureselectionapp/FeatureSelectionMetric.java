@@ -13,42 +13,34 @@ import java.util.Set;
  *
  * @author magdy
  */
-public abstract class FeatureSelectionMetric implements Runnable {
+public abstract class FeatureSelectionMetric {
 
-    protected Set<String> subset_of_features_names;
     protected TMap<String, CustomStringIntHashMap> features_frequencies_per_class;
     protected CustomStringIntHashMap classes_frequencies;
     protected CustomStringIntHashMap features_frequencies;
     protected int all_classes_count;
     protected int all_features_count;
     protected int all_data_set_records_count;
-    protected FeatureSelectionObserver observer;
 
     protected void takeInput(
-            Set<String> _subset_of_features_names,
             TMap<String, CustomStringIntHashMap> _features_frequencies_per_class,
             CustomStringIntHashMap _classes_frequencies,
             CustomStringIntHashMap _features_frequencies,
-            int _all_data_set_records_count,
-            FeatureSelectionObserver _observer) {
-        subset_of_features_names = _subset_of_features_names;
+            int _all_data_set_records_count) {
         features_frequencies_per_class = _features_frequencies_per_class;
         classes_frequencies = _classes_frequencies;
         features_frequencies = _features_frequencies;
         all_classes_count = _classes_frequencies.size();
         all_features_count = _features_frequencies.size();
         all_data_set_records_count = _all_data_set_records_count;
-        observer = _observer;
     }
 
     public static FeatureSelectionMetric getInstance(
             FeatureSelectionMetricEnum _type,
-            Set<String> _subset_of_features_names,
             TMap<String, CustomStringIntHashMap> _features_frequencies_per_class,
             CustomStringIntHashMap _classes_frequencies,
             CustomStringIntHashMap _features_frequencies,
-            int _all_data_set_records_count,
-            FeatureSelectionObserver _observer) {
+            int _all_data_set_records_count) {
 
         FeatureSelectionMetric metric = null;
         if (_type == FeatureSelectionMetricEnum.PMI) {
@@ -59,15 +51,15 @@ public abstract class FeatureSelectionMetric implements Runnable {
             throw new IllegalArgumentException("Invalid FeatureSelectionMetric type");
         }
         metric.takeInput(
-                _subset_of_features_names,
                 _features_frequencies_per_class,
                 _classes_frequencies,
                 _features_frequencies,
-                _all_data_set_records_count,
-                _observer);
+                _all_data_set_records_count);
         return metric;
     }
 
+    public abstract TMap<String, Double> execute();
+    
     ///// List of Metrics ///////////////////////
     private static class MetricPMI extends FeatureSelectionMetric {
 
@@ -80,7 +72,9 @@ public abstract class FeatureSelectionMetric implements Runnable {
         }
 
         private double p_of_f_intersect_c(String _class_name, String _feature_name) {
-            return (double) features_frequencies_per_class.get(_feature_name).get(_class_name) / (double) all_data_set_records_count;
+            Integer i = features_frequencies_per_class.get(_feature_name).get(_class_name);
+            if (i != null) return (double)i / (double) all_data_set_records_count;
+            return 0;
         }
 
         private double p_of_c_given_f(String _class_name, String _feature_name) {
@@ -107,20 +101,21 @@ public abstract class FeatureSelectionMetric implements Runnable {
         }
 
         @Override
-        public void run() {
-
+        public TMap<String, Double> execute() {
             TMap<String, Double> scores = new THashMap(features_frequencies.size());
             for (String feature_name : features_frequencies.keySet()) {
                 scores.put(feature_name, pmiOfFeatureForAllClasses(feature_name));
             }
-            observer.selectedFeatures(scores);
+            return scores;
         }
     }
 
     private static class MetricChi2 extends FeatureSelectionMetric {
 
         private double classObservedFrequency(String _feature_name, String _class_name) {
-            return features_frequencies_per_class.get(_feature_name).get(_class_name);
+            Integer i = features_frequencies_per_class.get(_feature_name).get(_class_name);
+            if (i != null) return i;
+            return 0;
         }
 
         private double classExpectedFrequency(String _class_name) {
@@ -142,14 +137,13 @@ public abstract class FeatureSelectionMetric implements Runnable {
             return sum;
         }
 
-        
         @Override
-        public void run() {
+        public TMap<String, Double> execute() {
             TMap<String, Double> scores = new THashMap(features_frequencies.size());
             for (String feature_name : features_frequencies.keySet()) {
                 scores.put(feature_name, chi2OfFeatureForAllClasses(feature_name));
             }
-            observer.selectedFeatures(scores);
+            return scores;
         }
     }
 }
