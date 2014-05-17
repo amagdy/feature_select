@@ -1,0 +1,45 @@
+<project name="FeatureSelectionApp" basedir="." default="main">
+
+    <property file="build.properties" />
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="*.jar"/>
+    </path>
+
+    <path id="application" location="${jar.dir}/${app.name}.jar"/>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${jar.dir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" includeantruntime="false" destdir="${classes.dir}" classpathref="classpath"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        
+        <jar destfile="${jar.dir}/${app.name}.jar" basedir="${classes.dir}">
+          <manifest>
+            <attribute name="Class-Path" value="${lib.dir}"/>
+            <attribute name="Main-Class" value="${main.class}"/>
+          </manifest>
+          <zipgroupfileset  dir="${lib.dir}"/>
+        </jar>
+    </target>
+
+    <target name="run" depends="jar">
+        <java jar="${jar.dir}/${app.name}.jar" fork="true">
+            <classpath>
+                <path refid="classpath"/>
+                <path refid="application"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="clean-build" depends="clean,jar"/>
+
+    <target name="main" depends="clean,run"/>
+
+</project>

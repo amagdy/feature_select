@@ -1,0 +1,12 @@
+#!/bin/bash
+JAR_FILE_PATH="dist/FeatureSelectionApp.jar"
+
+# if the jar does not exist then build it
+if [ ! -e "$JAR_FILE_PATH" ]; then
+  ant clean
+  ant
+fi
+
+# run the jar file with all the params and print the time taken
+java -jar dist/FeatureSelectionApp.jar $@
+
