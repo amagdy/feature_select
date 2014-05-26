@@ -168,7 +168,7 @@ public abstract class FeatureSelectionMetric {
 		double nc1f1, nc0f0, nc1f0, nc0f1, nc1, nf1, nf0, nc0;
 		int n = all_data_set_records_count;
 		nf1 = Nf1(_feature);
-		nf0 = Nf0(_feature, n);
+		//nf0 = Nf0(_feature, n);
 		for (String _class : classes_frequencies.keySet()) {
 			nc1   = Nc1(_class);
 			nc0   = Nc0(_class, n);
@@ -177,15 +177,16 @@ public abstract class FeatureSelectionMetric {
 			nc1f0 = Nc1f0(_class, _feature);
 			nc0f1 = Nc0f1(_class, _feature);
 			//http://blog.datumbox.com/using-feature-selection-methods-in-text-classification/
-			double val = (n * Math.pow((nc1f1 * nc0f0) - (nc1f0 * nc0f1), 2.0)) / (
+			double d = (
 		    	(nc1f1 + nc0f1) *
 		    	(nc1f1 + nc1f0) *
 		    	(nc1f0 + nc0f0) *
-		    	(nc0f1 + nc0f0)
-		    );
-		    	if (val > sum) sum = val; 
+		    	(nc0f1 + nc0f0));
+			double val = 0.0;
+			if (d != 0.0) val = (n * Math.pow((nc1f1 * nc0f0) - (nc1f0 * nc0f1), 2.0)) / d;
+		    	sum += val;
 		}
-            return sum;// / (double)all_classes_count;
+		return sum / (double)all_classes_count;
         }
 
         @Override

@@ -161,10 +161,8 @@ public class FeatureSelectionApp extends ThreadObserver {
                 double diff = all_features_scores.get(o2) - all_features_scores.get(o1);    // descendingly
                 if (diff > 0) {
                     return 1;
-                } else if (diff < 0) {
-                    return -1;
                 } else {
-                    return 0;
+                    return -1;
                 }
             }
         });
@@ -175,7 +173,7 @@ public class FeatureSelectionApp extends ThreadObserver {
         int i = 0;
         while (features_names.hasNext() && i < selected_features_count) {
             String fname = features_names.next();
-            os.println(fname + "\t" + all_features_sorted_scores.get(fname));
+            os.println(fname + "\t" + all_features_scores.get(fname));
             i++;
         }
         if (output_file != null) {
