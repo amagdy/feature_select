@@ -63,39 +63,42 @@ public abstract class FeatureSelectionMetric {
     ///// List of Metrics ///////////////////////
     private static class MetricPMI extends FeatureSelectionMetric {
 
-        private double p_of_f(String _feature_name) {
-            return (double) features_frequencies.get(_feature_name) / (double) all_data_set_records_count;
+        private double p_of_f(String _feature) {
+            return (double) features_frequencies.get(_feature) / (double) all_data_set_records_count;
         }
 
-        private double p_of_c(String _class_name) {
-            return (double) classes_frequencies.get(_class_name) / (double) all_data_set_records_count;
+        private double p_of_c(String _class) {
+            return (double) classes_frequencies.get(_class) / (double) all_data_set_records_count;
         }
 
-        private double p_of_f_intersect_c(String _class_name, String _feature_name) {
-            Integer i = features_frequencies_per_class.get(_feature_name).get(_class_name);
-            if (i != null) return (double)i / (double) all_data_set_records_count;
-            return 0;
+        private double p_of_f_intersect_c(String _class, String _feature) {
+		CustomStringIntHashMap map = features_frequencies_per_class.get(_feature);
+		if (map == null) return 0;
+		Integer i = map.get(_class);
+		if (i == null) i = 0;
+		return (double)i / (double) all_data_set_records_count;
         }
 
-        private double p_of_c_given_f(String _class_name, String _feature_name) {
-            return p_of_f_intersect_c(_class_name, _feature_name) / p_of_f(_feature_name);
+        private double p_of_c_given_f(String _class, String _feature) {
+            return p_of_f_intersect_c(_class, _feature) / p_of_f(_feature);
         }
 
-        private double p_of_f_given_c(String _feature_name, String _class_name) {
-            return p_of_f_intersect_c(_class_name, _feature_name) / p_of_c(_class_name);
+        private double p_of_f_given_c(String _feature, String _class) {
+            return p_of_f_intersect_c(_class, _feature) / p_of_c(_class);
         }
 
         private double log2(double _num) {
+            if (_num == 0.0) return 0.0;  
             return Math.log(_num) / Math.log(2);
         }
 
-        private double pmiOfFeatureForAllClasses(String _feature_name) {
+        private double pmiOfFeatureForAllClasses(String _feature) {
             // PMI(f) = sum<all_classes>(P(f,c) * Log2(P(f|c) / P(f)))
             double sum = 0.0;
             for (String class_name : classes_frequencies.keySet()) {
                 // P(f, c)
-                sum += p_of_f_intersect_c(class_name, _feature_name)
-                        * log2(p_of_f_given_c(_feature_name, class_name) / p_of_f(_feature_name));
+                sum += p_of_f_intersect_c(class_name, _feature)
+                        * log2(p_of_f_given_c(_feature, class_name) / p_of_f(_feature));
             }
             return sum;
         }
@@ -112,29 +115,80 @@ public abstract class FeatureSelectionMetric {
 
     private static class MetricChi2 extends FeatureSelectionMetric {
 
-        private double classObservedFrequency(String _feature_name, String _class_name) {
-            Integer i = features_frequencies_per_class.get(_feature_name).get(_class_name);
-            if (i != null) return i;
-            return 0;
+	// class frequency
+	private double Nc1(String _class){
+		Integer i = classes_frequencies.get(_class);
+		if (i != null) return i;
+		return 0;
+	}
+	
+	// not class frequency
+	private double Nc0(String _class, int _records_count){
+		Integer i = classes_frequencies.get(_class);
+		if (i != null) return _records_count - i;
+		return _records_count;
+	}
+	
+	// feature frequency
+	private double Nf1(String _feature){
+		Integer i = features_frequencies.get(_feature);
+		if (i != null) return i;
+		return 0;
+	}
+	
+	// not feature frequency
+	private double Nf0(String _feature, int _records_count){
+		Integer i = features_frequencies.get(_feature);
+		if (i != null) return _records_count - i;
+		return _records_count;
+	}
+	
+	// N11
+        private double Nc1f1(String _class, String _feature) {
+	        CustomStringIntHashMap map = features_frequencies_per_class.get(_feature);
+	        if (map == null) return 0;
+		Integer i = map.get(_class);
+		if (i != null) return i;
+		return 0;
         }
-
-        private double classExpectedFrequency(String _class_name) {
-            return (double) all_data_set_records_count / (double) all_classes_count;
+        
+        // class With Out Feature Frequency N01
+        private double Nc1f0(String _class, String _feature) {
+		return Nc1(_class) - Nc1f1(_class, _feature);
         }
+        
+        // feature With Out Class Frequency
+	private double Nc0f1(String _class, String _feature) {
+		return Nf1(_feature) - Nc1f1(_class, _feature);
+        }
+        
+        // frequency With out Class And Feature
+        private double Nc0f0(String _class, String _feature, int _records_count) {
+		return _records_count - ((Nc1(_class) + Nf1(_feature)) - Nc1f1(_class, _feature));
+        }        
 
-        private double chi2OfFeatureForAllClasses(String _feature_name) {
-            /*
-                X^2 = Sum (O-E)^2 / E
-                O = C(f, c)
-                E = all_records_count / class_count 
-             */
-            double sum = 0.0;
-            for (String class_name : classes_frequencies.keySet()) {
-                double O = classObservedFrequency(_feature_name, class_name);
-                double E = classes_frequencies.get(class_name);//all_data_set_records_count / all_classes_count;
-                sum += Math.pow(O - E, 2) / E;
-            }
-            return sum;
+        private double chi2OfFeatureForAllClasses(String _feature) {
+		double sum = 0.0;
+		double nc1f1, nc0f0, nc1f0, nc0f1, nc1, nf1, nf0, nc0;
+		int n = all_data_set_records_count;
+		nf1 = Nf1(_feature);
+		nf0 = Nf0(_feature, n);
+		for (String _class : classes_frequencies.keySet()) {
+			nc1   = Nc1(_class);
+			nc0   = Nc0(_class, n);
+			nc1f1 = Nc1f1(_class, _feature);
+			nc0f0 = Nc0f0(_class, _feature, n);
+			nc1f0 = Nc1f0(_class, _feature);
+			nc0f1 = Nc0f1(_class, _feature);
+			//http://blog.datumbox.com/using-feature-selection-methods-in-text-classification/
+			sum += (n * Math.pow((nc1f1 * nc0f0) - (nc1f0 * nc0f1), 2.0)) / (
+		    	(nc1f1 + nc0f1) *
+		    	(nc1f1 + nc1f0) *
+		    	(nc1f0 + nc0f0) *
+		    	(nc0f1 + nc0f0)
+		    );
+		}
+            return sum / (double)all_classes_count;
         }
 
         @Override
