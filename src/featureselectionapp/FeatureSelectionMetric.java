@@ -118,15 +118,13 @@ public abstract class FeatureSelectionMetric {
 	// class frequency
 	private double Nc1(String _class){
 		Integer i = classes_frequencies.get(_class);
-		if (i != null) return i;
+		if (i != null) return (double)i.intValue();
 		return 0;
 	}
 	
 	// not class frequency
 	private double Nc0(String _class, int _records_count){
-		Integer i = classes_frequencies.get(_class);
-		if (i != null) return _records_count - i;
-		return _records_count;
+		return _records_count - Nc1(_class);
 	}
 	
 	// feature frequency
@@ -138,21 +136,19 @@ public abstract class FeatureSelectionMetric {
 	
 	// not feature frequency
 	private double Nf0(String _feature, int _records_count){
-		Integer i = features_frequencies.get(_feature);
-		if (i != null) return _records_count - i;
-		return _records_count;
+		return _records_count - Nf1(_feature);
 	}
 	
-	// N11
+	
         private double Nc1f1(String _class, String _feature) {
 	        CustomStringIntHashMap map = features_frequencies_per_class.get(_feature);
 	        if (map == null) return 0;
 		Integer i = map.get(_class);
-		if (i != null) return i;
+		if (i != null) return (double)i.intValue();
 		return 0;
         }
         
-        // class With Out Feature Frequency N01
+        // class With Out Feature Frequency
         private double Nc1f0(String _class, String _feature) {
 		return Nc1(_class) - Nc1f1(_class, _feature);
         }
@@ -181,14 +177,15 @@ public abstract class FeatureSelectionMetric {
 			nc1f0 = Nc1f0(_class, _feature);
 			nc0f1 = Nc0f1(_class, _feature);
 			//http://blog.datumbox.com/using-feature-selection-methods-in-text-classification/
-			sum += (n * Math.pow((nc1f1 * nc0f0) - (nc1f0 * nc0f1), 2.0)) / (
+			double val = (n * Math.pow((nc1f1 * nc0f0) - (nc1f0 * nc0f1), 2.0)) / (
 		    	(nc1f1 + nc0f1) *
 		    	(nc1f1 + nc1f0) *
 		    	(nc1f0 + nc0f0) *
 		    	(nc0f1 + nc0f0)
 		    );
+		    	if (val > sum) sum = val; 
 		}
-            return sum / (double)all_classes_count;
+            return sum;// / (double)all_classes_count;
         }
 
         @Override
