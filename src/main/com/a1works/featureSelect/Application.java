@@ -1,97 +1,23 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.a1works.featureSelect;
 
-import java.io.File;
+import com.a1works.utils.MayBe;
+
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.*;
 
-/**
- *
- * @author magdy
- */
-public class Application extends ThreadObserver {
+public final class Application extends ThreadObserver implements Runnable {
 
-    /**
-     * Map<feature_name, Map<class_name, frequency_of_feature_for_this_class>>
-     */
     private static Map<String, CustomStringIntHashMap> features_frequencies_per_class;
     private static CustomStringIntHashMap classes_frequencies = new CustomStringIntHashMap();
     private static CustomStringIntHashMap features_frequencies = new CustomStringIntHashMap();
     private static int all_classes_count = 0;
     private static int all_features_count = 0;
     private static int records_count = 0;
-    private static String data_set_file_path = null;
-    private static File output_file = null;
-    private static FeatureSelectionMetricEnum metric = null;
-    private static int selected_features_count = 0;
-    private static int threads_count = 1;
     private static final Object mutex = new Object();
     private static volatile boolean processing_done = false;
-
-    private static void parse_command_line(String argv[]) {
-        // parse options
-        int i;
-        for (i = 0; i < argv.length; i++) {
-            if (argv[i].charAt(0) != '-') {
-                // read data set file path
-                if (data_set_file_path == null) {
-                    data_set_file_path = argv[i];
-
-                } else if (output_file == null) {   // read output file path
-                    output_file = new File(argv[i]);
-                    if (!output_file.exists()) {
-                        try {
-                            output_file.createNewFile();
-                        } catch (IOException ex) {
-                            CustomLogger.logAndExit(ex, "Could not create output file: " + argv[i]);
-                        }
-                    }
-                    if (!output_file.canWrite()) {
-                        CustomLogger.logAndExit("Output file " + argv[i] + " is not writable");
-                    }
-                } else {    // else this is the end of the params
-                    break;
-                }
-            } else {
-                if (++i >= argv.length) {
-                    CustomLogger.exitWithUsage();
-                }
-                char option_char = argv[i - 1].charAt(1);
-                switch (option_char) {
-                    case 'h':
-                        CustomLogger.exitWithUsage();
-                        break;
-                    case 'm':
-                        try {
-                            metric = FeatureSelectionMetricEnum.getMetricByKey(argv[i]);
-                        } catch (IllegalArgumentException ex) {
-                            CustomLogger.logAndExit(ex.getMessage());
-                        }
-                        break;
-                    case 'n':
-                        selected_features_count = Integer.valueOf(argv[i]).intValue();
-                        break;
-                    case 't':
-                        threads_count = Integer.valueOf(argv[i]).intValue();
-                        if (threads_count > Constants.THREADS_MAX_COUNT) {
-                            threads_count = Constants.THREADS_MAX_COUNT;
-                        }
-                        break;
-                    default:
-                        CustomLogger.logAndExit("Invalid option: -" + option_char);
-                }
-            }
-        }
-
-        if (data_set_file_path == null || selected_features_count < 1 || metric == null) {
-            CustomLogger.logAndExitWithUsage("Data set file, metric and number of selected features are mandatory paramters");
-        }
-    }
+    private static AppOptions options;
 
     private static void readDataSetFile(List<DataSetFileEntry> _data) {
         features_frequencies_per_class = new HashMap();
@@ -116,18 +42,10 @@ public class Application extends ThreadObserver {
         all_classes_count = classes_frequencies.size();
     }
 
-    /**
-     * @param argv the command line arguments
-     */
-    public static void main(String[] argv) {
-        // parse the command options and read data set file into data structures
-        parse_command_line(argv);
 
-        // create an instance of this class to act as an observer for threads
-        Application app = new Application();
-        app.startThreads(threads_count, data_set_file_path);
-        
-        app.waitForAllThreads();
+    public Application(AppOptions options) {
+        this.options = options;
+
     }
 
     private void printOutput(final Map<String, Double> all_features_scores) {
@@ -201,5 +119,11 @@ public class Application extends ThreadObserver {
             }
         }
     }
-    
+
+
+    @Override
+    public void run() {
+        startThreads(options.getThreadsCount(), options.getDataSetFile());
+        waitForAllThreads();
+    }
 }

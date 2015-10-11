@@ -4,11 +4,7 @@
  */
 package com.a1works.featureSelect;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,11 +16,11 @@ public class ReaderThread {
 
     private ThreadObserver observer = null;
     private int thread_index = 0;
-    private String file_path;
+    private File dataSetFile;
     private int thread_count = 0;
     
-    public ReaderThread(String _file_path, int _thread_index, int _thread_count, ThreadObserver _observer){
-        file_path = _file_path;
+    public ReaderThread(File dataSetFile, int _thread_index, int _thread_count, ThreadObserver _observer){
+        this.dataSetFile = dataSetFile;
         thread_index = _thread_index;
         thread_count = _thread_count;
         observer = _observer;
@@ -38,7 +34,7 @@ public class ReaderThread {
                 List<DataSetFileEntry> class_features = new ArrayList();
                 BufferedReader br = null;
                 try {
-                    br = new BufferedReader(new InputStreamReader(new FileInputStream(file_path)));
+                    br = new BufferedReader(new InputStreamReader(new FileInputStream(dataSetFile)));
                 } catch (FileNotFoundException ex) {
                     CustomLogger.logAndExit(ex, "Could not open Data set file for reading");
                 }

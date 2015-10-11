@@ -6,7 +6,6 @@ package com.a1works.featureSelect;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *
@@ -35,16 +34,16 @@ public abstract class FeatureSelectionMetric {
     }
 
     public static FeatureSelectionMetric getInstance(
-            FeatureSelectionMetricEnum _type,
+            FeatureSelectionMetricName _type,
             Map<String, CustomStringIntHashMap> _features_frequencies_per_class,
             CustomStringIntHashMap _classes_frequencies,
             CustomStringIntHashMap _features_frequencies,
             int _all_data_set_records_count) {
 
         FeatureSelectionMetric metric = null;
-        if (_type == FeatureSelectionMetricEnum.PMI) {
+        if (_type == FeatureSelectionMetricName.PMI) {
             metric = new MetricPMI();
-        } else if (_type == FeatureSelectionMetricEnum.CHI2) {
+        } else if (_type == FeatureSelectionMetricName.CHI2) {
             metric = new MetricChi2();
         } else {
             throw new IllegalArgumentException("Invalid FeatureSelectionMetric type");

@@ -19,11 +19,10 @@ public abstract class ThreadObserver {
     private AtomicInteger working_threads;
     private int threads_count = 0;
     
-    public void startThreads(int _thread_count, String _file_path) {
+    public void startThreads(int _thread_count, File dataSetFile) {
         // adjust threads count and features per thread
-        File data_set_file = new File(_file_path);
-        if (!data_set_file.exists()) {
-            CustomLogger.logAndExit("Dataset file " + _file_path + "does not exist");
+        if (!dataSetFile.exists()) {
+            throw new UsageException("Dataset file does not exist");
         }
         threads_count = _thread_count;
         
