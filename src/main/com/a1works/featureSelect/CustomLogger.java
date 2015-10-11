@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package featureselectionapp;
+package com.a1works.featureSelect;
 
 import java.io.PrintStream;
 

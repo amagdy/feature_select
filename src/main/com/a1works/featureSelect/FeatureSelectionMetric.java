@@ -2,10 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package featureselectionapp;
+package com.a1works.featureSelect;
 
-import gnu.trove.map.TMap;
-import gnu.trove.map.hash.THashMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,7 +14,7 @@ import java.util.Set;
  */
 public abstract class FeatureSelectionMetric {
 
-    protected TMap<String, CustomStringIntHashMap> features_frequencies_per_class;
+    protected Map<String, CustomStringIntHashMap> features_frequencies_per_class;
     protected CustomStringIntHashMap classes_frequencies;
     protected CustomStringIntHashMap features_frequencies;
     protected int all_classes_count;
@@ -23,7 +22,7 @@ public abstract class FeatureSelectionMetric {
     protected int all_data_set_records_count;
 
     protected void takeInput(
-            TMap<String, CustomStringIntHashMap> _features_frequencies_per_class,
+            Map<String, CustomStringIntHashMap> _features_frequencies_per_class,
             CustomStringIntHashMap _classes_frequencies,
             CustomStringIntHashMap _features_frequencies,
             int _all_data_set_records_count) {
@@ -37,7 +36,7 @@ public abstract class FeatureSelectionMetric {
 
     public static FeatureSelectionMetric getInstance(
             FeatureSelectionMetricEnum _type,
-            TMap<String, CustomStringIntHashMap> _features_frequencies_per_class,
+            Map<String, CustomStringIntHashMap> _features_frequencies_per_class,
             CustomStringIntHashMap _classes_frequencies,
             CustomStringIntHashMap _features_frequencies,
             int _all_data_set_records_count) {
@@ -58,7 +57,7 @@ public abstract class FeatureSelectionMetric {
         return metric;
     }
 
-    public abstract TMap<String, Double> execute();
+    public abstract Map<String, Double> execute();
     
     ///// List of Metrics ///////////////////////
     private static class MetricPMI extends FeatureSelectionMetric {
@@ -104,8 +103,8 @@ public abstract class FeatureSelectionMetric {
         }
 
         @Override
-        public TMap<String, Double> execute() {
-            TMap<String, Double> scores = new THashMap(features_frequencies.size());
+        public Map<String, Double> execute() {
+            Map<String, Double> scores = new HashMap(features_frequencies.size());
             for (String feature_name : features_frequencies.keySet()) {
                 scores.put(feature_name, pmiOfFeatureForAllClasses(feature_name));
             }
@@ -190,8 +189,8 @@ public abstract class FeatureSelectionMetric {
         }
 
         @Override
-        public TMap<String, Double> execute() {
-            TMap<String, Double> scores = new THashMap(features_frequencies.size());
+        public Map<String, Double> execute() {
+            Map<String, Double> scores = new HashMap(features_frequencies.size());
             for (String feature_name : features_frequencies.keySet()) {
                 scores.put(feature_name, chi2OfFeatureForAllClasses(feature_name));
             }

@@ -1,2 +1,7 @@
-build/*
-dist/*
+build/
+.gradle/
+.idea/
+data/*
+!data/small_sample.txt
+feature_select.iml
+out/

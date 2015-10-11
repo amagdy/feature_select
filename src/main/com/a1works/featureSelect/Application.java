@@ -2,36 +2,24 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package featureselectionapp;
+package com.a1works.featureSelect;
 
-import gnu.trove.map.TMap;
-import gnu.trove.map.hash.THashMap;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.*;
 
 /**
  *
  * @author magdy
  */
-public class FeatureSelectionApp extends ThreadObserver {
+public class Application extends ThreadObserver {
 
     /**
      * Map<feature_name, Map<class_name, frequency_of_feature_for_this_class>>
      */
-    private static TMap<String, CustomStringIntHashMap> features_frequencies_per_class;
+    private static Map<String, CustomStringIntHashMap> features_frequencies_per_class;
     private static CustomStringIntHashMap classes_frequencies = new CustomStringIntHashMap();
     private static CustomStringIntHashMap features_frequencies = new CustomStringIntHashMap();
     private static int all_classes_count = 0;
@@ -106,7 +94,7 @@ public class FeatureSelectionApp extends ThreadObserver {
     }
 
     private static void readDataSetFile(List<DataSetFileEntry> _data) {
-        features_frequencies_per_class = new THashMap();
+        features_frequencies_per_class = new HashMap();
         records_count = _data.size();
         for (DataSetFileEntry line_entry : _data) {
             classes_frequencies.increment(line_entry.class_name, 1);
@@ -129,20 +117,20 @@ public class FeatureSelectionApp extends ThreadObserver {
     }
 
     /**
-     * @param args the command line arguments
+     * @param argv the command line arguments
      */
     public static void main(String[] argv) {
         // parse the command options and read data set file into data structures
         parse_command_line(argv);
 
         // create an instance of this class to act as an observer for threads
-        FeatureSelectionApp app = new FeatureSelectionApp();
+        Application app = new Application();
         app.startThreads(threads_count, data_set_file_path);
         
         app.waitForAllThreads();
     }
 
-    private void printOutput(final TMap<String, Double> all_features_scores) {
+    private void printOutput(final Map<String, Double> all_features_scores) {
         PrintStream os = null;
         if (output_file != null) {
             try {
@@ -185,7 +173,7 @@ public class FeatureSelectionApp extends ThreadObserver {
     public void allThreadsFinished(List<DataSetFileEntry> _data) {
         readDataSetFile(_data);
         // execute feature selection
-        TMap<String, Double> all_features_scores = FeatureSelectionMetric.getInstance(
+        Map<String, Double> all_features_scores = FeatureSelectionMetric.getInstance(
                 metric,
                 features_frequencies_per_class,
                 classes_frequencies,

@@ -2,9 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package featureselectionapp;
+package com.a1works.featureSelect;
 
-import gnu.trove.map.TMap;
+
+import java.util.Map;
 
 /**
  *
@@ -12,6 +13,6 @@ import gnu.trove.map.TMap;
  */
 public interface FeatureSelectionObserver {
     
-    public void selectedFeatures(TMap<String, Double> _features_scores);
+    public void selectedFeatures(Map<String, Double> _features_scores);
     
 }

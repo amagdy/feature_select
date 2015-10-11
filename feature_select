@@ -1,12 +1,11 @@
 #!/bin/bash
-JAR_FILE_PATH="dist/FeatureSelectionApp.jar"
+JAR_FILE_PATH="build/libs/feature_select-1.0.jar"
 
 # if the jar does not exist then build it
 if [ ! -e "$JAR_FILE_PATH" ]; then
-  ant clean
-  ant
+  gradle jar
 fi
 
 # run the jar file with all the params and print the time taken
-java -jar dist/FeatureSelectionApp.jar $@
+java -jar $JAR_FILE_PATH $@
 
