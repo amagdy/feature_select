@@ -1,7 +1,11 @@
-build/
 .gradle/
+gradle/
+gradlew
+gradlew.bat
+
+build/
 .idea/
 data/*
 !data/small_sample.txt
-feature_select.iml
+*.iml
 out/
