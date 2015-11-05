@@ -1,13 +1,14 @@
 package com.a1works.featureSelection;
 
+import com.a1works.urils.EqualsBuilder;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Created by Ahmed Magdy <ahmed_magdy@epam.com> on 18.10.15.
  */
-public class Feature implements NamedObject{
+public class Feature implements Event {
 
     private final String featureName;
 
@@ -36,12 +37,22 @@ public class Feature implements NamedObject{
         return featureName;
     }
 
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Feature))
-            return false;
-        return ((Feature)o).getName().equals(getName());
+        for (EqualsBuilder<Feature> equalsBuilder : EqualsBuilder.createInstanceIfParamsHaveSameType(this, o)) {
+            Feature otherFeature = equalsBuilder.getOtherObject();
+            return equalsBuilder
+                    .appendSuper(super.equals(o))
+                    .append(getName(), otherFeature.getName())
+                    .isEqual();
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 + getName().hashCode();
     }
 
     @Override

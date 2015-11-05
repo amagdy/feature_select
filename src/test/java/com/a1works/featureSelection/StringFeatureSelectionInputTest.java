@@ -3,6 +3,7 @@ package com.a1works.featureSelection;
 import org.junit.Test;
 
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -16,12 +17,11 @@ public class StringFeatureSelectionInputTest {
     public void givenOneLineWhenParseThenItShouldWork(){
         MlClass cls = MlClass.getInstance("1");
         FeatureSelectionInput target = StringFeatureSelectionInput.createInstance("1 1:1 2:1 3:1");
-        assertEquals("Number of records must be 1.", 1, target.getNumberOfAllRecords());
-        Map<MlClass, Frequency> classesFrequencies = target.getClassesFrequencies();
-        assertEquals("Number of classes must be 1.", 1, classesFrequencies.size());
-        assertTrue("First class name should be '1'.", classesFrequencies.containsKey(cls));
-        assertEquals("Number of features must be 3.", 3, target.getFeaturesFrequencies().size());
-        assertEquals(1, target.getFeatureFrequencyPerClass().size());
+        assertEquals("Number of records must be 1.", 1, target.getRecordsCount());
+        Set<MlClass> classes = target.getMlClasses();
+        assertEquals("Number of classes must be 1.", 1, classes.size());
+        assertTrue("First class name should be '1'.", classes.contains(cls));
+        assertEquals("Number of features must be 3.", 3, target.getFeatures().size());
     }
 
     @Test
@@ -37,10 +37,9 @@ public class StringFeatureSelectionInputTest {
                 "0 1:1 4:1 12:1\n" +
                 "0 1:1 2:1 4:1 13:1\n" +
                 "0 1:1 4:1 14:1");
-        assertEquals(10, target.getNumberOfAllRecords());
-        assertEquals(2, target.getClassesFrequencies().size());
-        assertEquals(14, target.getFeaturesFrequencies().size());
-        assertEquals(2, target.getFeatureFrequencyPerClass().size());
+        assertEquals(10, target.getRecordsCount());
+        assertEquals(2, target.getMlClasses().size());
+        assertEquals(14, target.getFeatures().size());
     }
 
     @Test(expected = InvalidRecordFormatException.class)

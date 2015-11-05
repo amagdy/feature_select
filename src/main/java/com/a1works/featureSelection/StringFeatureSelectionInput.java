@@ -1,7 +1,6 @@
 package com.a1works.featureSelection;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -9,9 +8,9 @@ import java.util.regex.Pattern;
  */
 public final class StringFeatureSelectionInput implements FeatureSelectionInput {
 
-    private Map<Feature, Frequency> featuresFrequencies = new HashMap<>();
-    private Map<MlClass, Map<Feature, Frequency>> featureFrequencyPerClass = new HashMap<>();
-    private Map<MlClass, Frequency> classesFrequencies = new HashMap<>();
+    private Map<Feature, Frequency<Feature>> featuresFrequencies = new HashMap<>();
+    private Map<MlClass, Map<Feature, Frequency<Feature>>> featureFrequencyPerClass = new HashMap<>();
+    private Map<MlClass, Frequency<MlClass>> classesFrequencies = new HashMap<>();
     private long numberOfAllRecords;
 
     private static final Pattern recordPattern = Pattern.compile("^[a-zA-Z0-9_]+( +[a-zA-Z0-9_]+:[0-9]+)+$");
@@ -22,9 +21,9 @@ public final class StringFeatureSelectionInput implements FeatureSelectionInput 
         if (input == null)
             throw new IllegalArgumentException("Input cannot be null.");
 
-        Map<Feature, Frequency> featuresFrequencies = new HashMap<>();
-        Map<MlClass, Map<Feature, Frequency>> featureFrequencyPerClass = new HashMap<>();
-        Map<MlClass, Frequency> classesFrequencies = new HashMap<>();
+        Map<Feature, Frequency<Feature>> featuresFrequencies = new HashMap<>();
+        Map<MlClass, Map<Feature, Frequency<Feature>>> featureFrequencyPerClass = new HashMap<>();
+        Map<MlClass, Frequency<MlClass>> classesFrequencies = new HashMap<>();
         int recordsCount = 0;
 
         String[] records = input.split("\n");
@@ -52,20 +51,20 @@ public final class StringFeatureSelectionInput implements FeatureSelectionInput 
     private StringFeatureSelectionInput() {}
 
     private static void processOneRecord(
-        Map<Feature, Frequency> featuresFrequencies,
-        Map<MlClass, Frequency> classesFrequencies,
-        Map<MlClass, Map<Feature, Frequency>> featureFrequencyPerClass,
+        Map<Feature, Frequency<Feature>> featuresFrequencies,
+        Map<MlClass, Frequency<MlClass>> classesFrequencies,
+        Map<MlClass, Map<Feature, Frequency<Feature>>> featureFrequencyPerClass,
         String record
     ) {
         String[] recordParts = record.split(" +");
         MlClass cls = MlClass.getInstance(recordParts[0]);
         if (classesFrequencies.containsKey(cls)) {
-            classesFrequencies.get(cls).incrementBy(1);
+            classesFrequencies.get(cls).incrementFrequency(1);
         } else {
-            classesFrequencies.put(cls, new Frequency(1));
+            classesFrequencies.put(cls, new Frequency<MlClass>(cls, 1));
         }
         if (!featureFrequencyPerClass.containsKey(cls)) {
-            featureFrequencyPerClass.put(cls, new HashMap<Feature, Frequency>());
+            featureFrequencyPerClass.put(cls, new HashMap<Feature, Frequency<Feature>>());
         }
 
         for (int i = 1; i < recordParts.length; i++) {
@@ -73,39 +72,52 @@ public final class StringFeatureSelectionInput implements FeatureSelectionInput 
             Feature feature = Feature.getInstance(featureAndFreq[0]);
             long freq = Long.valueOf(featureAndFreq[1]).longValue();
             if (featuresFrequencies.containsKey(feature)) {
-                featuresFrequencies.get(feature).incrementBy(freq);
+                featuresFrequencies.get(feature).incrementFrequency(freq);
             } else {
-                featuresFrequencies.put(feature, new Frequency(freq));
+                featuresFrequencies.put(feature, new Frequency<Feature>(feature, freq));
             }
 
             if (featureFrequencyPerClass.get(cls).containsKey(feature)) {
-                featureFrequencyPerClass.get(cls).get(feature).incrementBy(freq);
+                featureFrequencyPerClass.get(cls).get(feature).incrementFrequency(freq);
             } else {
-                featureFrequencyPerClass.get(cls).put(feature, new Frequency(freq));
+                featureFrequencyPerClass.get(cls).put(feature, new Frequency<Feature>(feature, freq));
             }
         }
     }
 
 
     @Override
-    public Map<Feature, Frequency> getFeaturesFrequencies() {
-        return featuresFrequencies;
+    public Set<Feature> getFeatures() {
+        return featuresFrequencies.keySet();
     }
 
     @Override
-    public Map<MlClass, Map<Feature, Frequency>> getFeatureFrequencyPerClass() {
-        return featureFrequencyPerClass;
+    public Set<MlClass> getMlClasses() {
+        return classesFrequencies.keySet();
     }
 
     @Override
-    public Map<MlClass, Frequency> getClassesFrequencies() {
-        return classesFrequencies;
+    public long getFeatureFrequency(Feature feature) {
+        return featuresFrequencies.get(feature).getFrequency();
     }
 
     @Override
-    public long getNumberOfAllRecords() {
+    public long getMlClassFrequency(MlClass cls) {
+        return classesFrequencies.get(cls).getFrequency();
+    }
+
+    @Override
+    public long getRecordsCount() {
         return numberOfAllRecords;
     }
 
+    @Override
+    public long getFeatureFrequencyPerClass(Feature feature, MlClass cls) {
+        Map<Feature, Frequency<Feature>> classFeatures = featureFrequencyPerClass.get(cls);
+        if (classFeatures == null) return 0;
+        Frequency<Feature> featureFrequency = featureFrequencyPerClass.get(cls).get(feature);
+        if (featureFrequency == null) return 0;
+        return featureFrequency.getFrequency();
+    }
 
 }

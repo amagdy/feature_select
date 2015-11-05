@@ -1,18 +1,23 @@
 package com.a1works.featureSelection;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Ahmed Magdy <ahmed_magdy@epam.com> on 18.10.15.
  */
 public interface FeatureSelectionInput {
 
-    public Map<Feature, Frequency> getFeaturesFrequencies();
+    public Set<Feature> getFeatures();
 
-    public Map<MlClass, Map<Feature, Frequency>> getFeatureFrequencyPerClass();
+    public Set<MlClass> getMlClasses();
 
-    public Map<MlClass, Frequency> getClassesFrequencies();
+    public long getFeatureFrequency(Feature feature);
 
-    public long getNumberOfAllRecords();
+    public long getMlClassFrequency(MlClass cls);
+
+    public long getFeatureFrequencyPerClass(Feature feature, MlClass cls);
+
+    public long getRecordsCount();
 
 }

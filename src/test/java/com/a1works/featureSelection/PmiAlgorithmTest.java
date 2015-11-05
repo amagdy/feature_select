@@ -36,7 +36,7 @@ public class PmiAlgorithmTest {
     @Test
     public void checkIfPmiCalculatesCorrectResultsForCorrectData(){
         FeatureSelectionAlgorithm target = new PmiAlgorithm();
-        SortedMap<Feature, Score> featuresScores = target.scoreFeatures(getInputFromString(INPUT_SMALL_DATA));
+        SortedSet<ScoredFeature> featuresScores = target.scoreFeatures(getInputFromString(INPUT_SMALL_DATA));
         assertNotNull("Features scores cannot be Null.", featuresScores);
     }
 

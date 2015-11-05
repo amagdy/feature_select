@@ -1,48 +1,47 @@
 package com.a1works.featureSelection;
 
-import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Created by Ahmed Magdy <ahmed_magdy@epam.com> on 18.10.15.
+ * Created by Ahmed Magdy Ezzeldin <a.magdy@a1works.com> on 25/10/15.
  */
-public class Frequency implements Comparable<Frequency> {
+final class Frequency<E extends Event> {
+    private E event;
+    private AtomicLong frequency;
 
-    private final AtomicLong frequency = new AtomicLong();
-
-    public Frequency(){
-
+    public Frequency(E event){
+        this.event = event;
+        frequency = new AtomicLong(0);
     }
 
-    public Frequency(long initialFrequency) {
-        frequency.set(initialFrequency);
+    public Frequency(E event, long frequency){
+        this.event = event;
+        this.frequency = new AtomicLong(frequency);
     }
 
-    public long incrementBy(long inc) {
-        return frequency.addAndGet(inc);
+    public long getFrequency(){
+        return frequency.longValue();
     }
 
-    public long longValue(){
-        return frequency.get();
+    public void incrementFrequency(long incrementValue){
+        frequency.addAndGet(incrementValue);
     }
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Frequency))
-            return false;
-        return ((Frequency)o).longValue() == longValue();
+    public E getEvent(){
+        return event;
     }
 
     @Override
-    public String toString(){
-        return String.format("Frequency(%ld)", longValue());
+    public boolean equals(Object other){
+        if (other == this) return true;
+        if (!(other instanceof Frequency)) return false;
+        Frequency otherEventFrequency = (Frequency)other;
+        return otherEventFrequency.getEvent().equals(this.getEvent());
     }
 
     @Override
-    public int compareTo(Frequency o) {
-        if (o == null) return 1;
-        return Long.compare(longValue(), o.longValue());
+    public int hashCode(){
+        return event.hashCode();
     }
+
 }

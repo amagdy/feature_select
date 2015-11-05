@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by Ahmed Magdy <ahmed_magdy@epam.com> on 18.10.15.
  */
-public class MlClass implements NamedObject {
+public class MlClass implements Event {
 
     private final String className;
 
