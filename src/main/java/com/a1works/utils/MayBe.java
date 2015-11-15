@@ -1,4 +1,4 @@
-package com.a1works.urils;
+package com.a1works.utils;
 
 import java.util.Collections;
 import java.util.Iterator;

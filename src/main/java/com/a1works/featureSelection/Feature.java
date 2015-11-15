@@ -1,6 +1,6 @@
 package com.a1works.featureSelection;
 
-import com.a1works.urils.EqualsBuilder;
+import com.a1works.utils.EqualsBuilder;
 
 import java.util.HashMap;
 import java.util.Map;

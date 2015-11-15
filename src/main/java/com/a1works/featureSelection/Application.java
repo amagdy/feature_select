@@ -1,6 +1,10 @@
 package com.a1works.featureSelection;
 
+import com.a1works.utils.EqualsBuilder;
+import com.a1works.utils.MayBe;
+
 import java.io.*;
+import java.lang.reflect.Field;
 
 /**
  * Created by Ahmed Magdy <ahmed_magdy@epam.com> on 18.10.15.
@@ -13,6 +17,11 @@ public final class Application implements Runnable {
 
     public static Application getInstance(){
         return INSTANCE;
+    }
+
+    public static boolean function (String msg) {
+        System.out.println(msg);
+        return true;
     }
 
     public static void main(String[] arguments){
