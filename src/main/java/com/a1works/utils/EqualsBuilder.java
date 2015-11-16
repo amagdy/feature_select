@@ -124,7 +124,7 @@ public class EqualsBuilder<T> {
             } else if (field1 instanceof double[]) {
                 return Arrays.equals((double[])field1, (double[])field2);
             } else {
-                return Arrays.equals((Object[])field1, (Object[])field2);
+                return Arrays.deepEquals((Object[])field1, (Object[])field2);
             }
         } else {    // Object
             return field1.equals(field2);

@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * Created by Ahmed Magdy Ezzeldin <a.magdy@a1works.com> on 4/11/15.
  */
-public class HashcodeBuilder {
+public final class HashcodeBuilder {
     private static final int DEFAULT_INITIAL_PRIME = 31;
     private static final int DEFAULT_MULTIPLIER_PRIME = 13;
 
@@ -27,101 +27,91 @@ public class HashcodeBuilder {
     }
 
     public HashcodeBuilder appendSuper(int intSuperHashCode) {
-        hashCode = (multiplier * hashCode) + intSuperHashCode;
+        appendHashCode(intSuperHashCode);
         return this;
     }
 
     public HashcodeBuilder append(boolean boolField) {
-        hashCode = (multiplier * hashCode) + (boolField ? 1 : 0);
+        appendHashCode((boolField ? 1 : 0));
         return this;
     }
 
-    public HashcodeBuilder append(boolean[] arrayField) {
-        hashCode = (multiplier * hashCode) + (arrayField == null ? 0 : Arrays.hashCode(arrayField));
+    public HashcodeBuilder append(byte byteField) {
+        appendHashCode((int)byteField);
         return this;
     }
 
+    public HashcodeBuilder append(char charField) {
+        appendHashCode((int)charField);
+        return this;
+    }
+
+    public HashcodeBuilder append(short shortField) {
+        appendHashCode((int)shortField);
+        return this;
+    }
     public HashcodeBuilder append(int intField) {
-        hashCode = (multiplier * hashCode) + intField;
-        return this;
-    }
-
-    public HashcodeBuilder append(int[] arrayField) {
-        hashCode = (multiplier * hashCode) + (arrayField == null ? 0 : Arrays.hashCode(arrayField));
+        appendHashCode(intField);
         return this;
     }
 
     public HashcodeBuilder append(long longField) {
-        hashCode = (multiplier * hashCode) + (int) (longField ^ (longField >>> 32));
-        return this;
-    }
-
-    public HashcodeBuilder append(long[] arrayField) {
-        hashCode = (multiplier * hashCode) + (arrayField == null ? 0 : Arrays.hashCode(arrayField));
+        appendHashCode((int) (longField ^ (longField >>> 32)));
         return this;
     }
 
     public HashcodeBuilder append(float floatField) {
-        hashCode = (multiplier * hashCode) + Float.floatToIntBits(floatField);;
-        return this;
-    }
-
-    public HashcodeBuilder append(float[] arrayField) {
-        hashCode = (multiplier * hashCode) + (arrayField == null ? 0 : Arrays.hashCode(arrayField));
+        appendHashCode(Float.floatToIntBits(floatField));
         return this;
     }
 
     public HashcodeBuilder append(double doubleField) {
         long longVal = Double.doubleToLongBits(doubleField);
-        hashCode = (multiplier * hashCode) + (int) (longVal ^ (longVal >>> 32));
+        appendHashCode((int) (longVal ^ (longVal >>> 32)));
         return this;
     }
 
-    public HashcodeBuilder append(double[] arrayField) {
-        hashCode = (multiplier * hashCode) + (arrayField == null ? 0 : Arrays.hashCode(arrayField));
-        return this;
-    }
-
-    public HashcodeBuilder append(char charField) {
-        hashCode = (multiplier * hashCode) + (int)charField;
-        return this;
-    }
-
-    public HashcodeBuilder append(char[] arrayField) {
-        hashCode = (multiplier * hashCode) + (arrayField == null ? 0 : Arrays.hashCode(arrayField));
-        return this;
-    }
-
-    public HashcodeBuilder append(byte byteField) {
-        hashCode = (multiplier * hashCode) + (int)byteField;
-        return this;
-    }
-
-    public HashcodeBuilder append(byte[] arrayField) {
-        hashCode = (multiplier * hashCode) + (arrayField == null ? 0 : Arrays.hashCode(arrayField));
-        return this;
-    }
-
-    public HashcodeBuilder append(short shortField) {
-        hashCode = (multiplier * hashCode) + (int)shortField;
-        return this;
-    }
-
-    public HashcodeBuilder append(short[] arrayField) {
-        hashCode = (multiplier * hashCode) + (arrayField == null ? 0 : Arrays.hashCode(arrayField));
-        return this;
-    }
-
+    /**
+     * Appends any object, object array or primitive array
+     * @param objectField
+     * @return HashcodeBuilder
+     */
     public HashcodeBuilder append(Object objectField) {
-        hashCode = (multiplier * hashCode) + objectField.hashCode();
-        return this;
-    }
-
-    public HashcodeBuilder append(Object[] arrayField) {
-        hashCode = (multiplier * hashCode) + (arrayField == null ? 0 : Arrays.hashCode(arrayField));
+        appendHashCode(getObjectHashCode(objectField));
         return this;
     }
 
     public int getHashCode(){return hashCode;}
 
+    private void appendHashCode(int addedHashCode) {
+        hashCode = (multiplier * hashCode) + addedHashCode;
+    }
+
+    private int getObjectHashCode(Object field) {
+        if (field == null) return 0;
+        Class<?> cls = field.getClass();
+        if (cls.isArray()) {
+            if (field instanceof boolean[]) {
+                return Arrays.hashCode((boolean[])field);
+            } else if (field instanceof byte[]) {
+                return Arrays.hashCode((byte[]) field);
+            } else if (field instanceof char[]) {
+                return Arrays.hashCode((char[]) field);
+            } else if (field instanceof short[]) {
+                return Arrays.hashCode((short[]) field);
+            } else if (field instanceof int[]) {
+                return Arrays.hashCode((int[]) field);
+            } else if (field instanceof long[]) {
+                return Arrays.hashCode((long[]) field);
+            } else if (field instanceof float[]) {
+                return Arrays.hashCode((float[]) field);
+            } else if (field instanceof double[]) {
+                return Arrays.hashCode((double[]) field);
+            } else {
+                return Arrays.deepHashCode((Object[]) field);
+            }
+        } else {    // Object
+            return field.hashCode();
+        }
+    }
 }
