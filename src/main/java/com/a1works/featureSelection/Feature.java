@@ -1,6 +1,7 @@
 package com.a1works.featureSelection;
 
 import com.a1works.utils.EqualsBuilder;
+import com.a1works.utils.HashcodeBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +44,6 @@ public class Feature implements Event {
         for (EqualsBuilder<Feature> equalsBuilder : EqualsBuilder.createInstanceIfParamsHaveSameType(this, o)) {
             Feature otherFeature = equalsBuilder.getOtherObject();
             return equalsBuilder
-                    .appendSuper(super.equals(o))
                     .append(getName(), otherFeature.getName())
                     .isEqual();
         }
@@ -51,8 +51,10 @@ public class Feature implements Event {
     }
 
     @Override
-    public int hashCode() {
-        return 31 + getName().hashCode();
+    public int hashCode(){
+        return HashcodeBuilder.createInstance()
+                .append(getName())
+                .getHashCode();
     }
 
     @Override

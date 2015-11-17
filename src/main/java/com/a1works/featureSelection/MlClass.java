@@ -1,5 +1,8 @@
 package com.a1works.featureSelection;
 
+import com.a1works.utils.EqualsBuilder;
+import com.a1works.utils.HashcodeBuilder;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,11 +38,20 @@ public class MlClass implements Event {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MlClass))
-            return false;
-        return ((MlClass)o).getName().equals(getName());
+    public boolean equals(Object other){
+        for (EqualsBuilder<MlClass> equalsBuilder : EqualsBuilder.createInstanceIfParamsHaveSameType(this, other)) {
+            MlClass otherMlClass = (MlClass)other;
+            equalsBuilder.append(this.getName(), otherMlClass.getName());
+            return equalsBuilder.isEqual();
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode(){
+        return HashcodeBuilder.createInstance()
+                .append(getName())
+                .getHashCode();
     }
 
     @Override

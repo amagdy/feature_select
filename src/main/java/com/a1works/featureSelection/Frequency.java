@@ -1,5 +1,8 @@
 package com.a1works.featureSelection;
 
+import com.a1works.utils.EqualsBuilder;
+import com.a1works.utils.HashcodeBuilder;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -33,15 +36,19 @@ final class Frequency<E extends Event> {
 
     @Override
     public boolean equals(Object other){
-        if (other == this) return true;
-        if (!(other instanceof Frequency)) return false;
-        Frequency otherEventFrequency = (Frequency)other;
-        return otherEventFrequency.getEvent().equals(this.getEvent());
+        for (EqualsBuilder<Frequency<E>> equalsBuilder : EqualsBuilder.createInstanceIfParamsHaveSameType(this, other)) {
+            Frequency<E> otherEventFrequency = (Frequency<E>)other;
+            equalsBuilder.append(this.getEvent(), otherEventFrequency.getEvent());
+            return equalsBuilder.isEqual();
+        }
+        return false;
     }
 
     @Override
     public int hashCode(){
-        return event.hashCode();
+        return HashcodeBuilder.createInstance()
+                .append(getEvent())
+                .getHashCode();
     }
 
 }

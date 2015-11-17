@@ -19,11 +19,6 @@ public final class Application implements Runnable {
         return INSTANCE;
     }
 
-    public static boolean function (String msg) {
-        System.out.println(msg);
-        return true;
-    }
-
     public static void main(String[] arguments){
         getInstance().run();
     }
@@ -33,7 +28,7 @@ public final class Application implements Runnable {
     @Override
     public void run(){
         isAppRunning = true;
-        System.out.println("Hi Every one...");
+        //////TODO
     }
 
     public boolean isRunning(){

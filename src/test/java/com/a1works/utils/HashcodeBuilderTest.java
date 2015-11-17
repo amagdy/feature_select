@@ -142,8 +142,8 @@ public class HashcodeBuilderTest {
 
 
     private boolean areHashCodesEqual(TestEntityObject obj1, TestEntityObject obj2, int superHashCode, Class<?>[] classes){
-        HashcodeBuilder builder1 = HashcodeBuilder.createInstance(29, 31);
-        HashcodeBuilder builder2 = HashcodeBuilder.createInstance(29, 31);
+        HashcodeBuilder builder1 = HashcodeBuilder.createInstance();
+        HashcodeBuilder builder2 = HashcodeBuilder.createInstance();
         builder1.appendSuper(superHashCode);
         builder2.appendSuper(superHashCode);
         for (Class<?> cls : classes) {
@@ -187,7 +187,6 @@ public class HashcodeBuilderTest {
                 }
             }
         }
-        System.out.println(builder1.hashCode() + " == " + builder2.hashCode());
         return builder1.getHashCode() == builder2.getHashCode();
     }
 

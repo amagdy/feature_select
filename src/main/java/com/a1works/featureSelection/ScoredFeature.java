@@ -1,9 +1,12 @@
 package com.a1works.featureSelection;
 
+import com.a1works.utils.EqualsBuilder;
+import com.a1works.utils.HashcodeBuilder;
+
 /**
  * Created by Ahmed Magdy Ezzeldin <a.magdy@a1works.com> on 21/10/15.
  */
-public class ScoredFeature implements Event, Comparable<ScoredFeature> {
+public final class ScoredFeature implements Event, Comparable<ScoredFeature> {
 
     private double score;
     private Feature feature;
@@ -32,10 +35,20 @@ public class ScoredFeature implements Event, Comparable<ScoredFeature> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ScoredFeature))
-            return false;
-        return ((ScoredFeature)o).getScore() == getScore();
+        for (EqualsBuilder<ScoredFeature> equalsBuilder : EqualsBuilder.createInstanceIfParamsHaveSameType(this, o)) {
+            ScoredFeature otherFeature = equalsBuilder.getOtherObject();
+            return equalsBuilder
+                    .append(feature, otherFeature.feature)
+                    .isEqual();
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode(){
+        return HashcodeBuilder.createInstance()
+                .append(getName())
+                .getHashCode();
     }
 
     @Override
