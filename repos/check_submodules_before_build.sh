@@ -26,6 +26,8 @@ then
   fi
 else
   echo "Pulling project submodules..."
+  git submodule init
+  git submodule sync
   git submodule update
   ./$REPOS/check_submodules_before_build.sh
   echo "Built all submodules successfully."
