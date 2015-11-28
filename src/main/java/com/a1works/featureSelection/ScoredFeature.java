@@ -1,7 +1,7 @@
 package com.a1works.featureSelection;
 
-import com.a1works.utils.EqualsBuilder;
-import com.a1works.utils.HashcodeBuilder;
+import com.a1works.commons.EqualsBuilder;
+import com.a1works.commons.HashcodeBuilder;
 
 /**
  * Created by Ahmed Magdy Ezzeldin <a.magdy@a1works.com> on 21/10/15.

@@ -1,6 +1,8 @@
 package com.a1works.featureSelection;
 
-import java.util.*;
+
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Created by Ahmed Magdy <ahmed_magdy@epam.com> on 18.10.15.
@@ -34,7 +36,7 @@ public final class PmiAlgorithm implements FeatureSelectionAlgorithm {
     @Override
     public SortedSet<ScoredFeature> scoreFeatures(final FeatureSelectionInput input) {
         this.input = input;
-        SortedSet<ScoredFeature> scores = new TreeSet<ScoredFeature>();
+        SortedSet<ScoredFeature> scores = new TreeSet<>();
         for (Feature feature: input.getFeatures()) {
             scores.add(pmiOfFeatureForAllClasses(feature));
         }

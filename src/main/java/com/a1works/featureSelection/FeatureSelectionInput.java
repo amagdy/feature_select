@@ -1,6 +1,5 @@
 package com.a1works.featureSelection;
 
-import java.util.Map;
 import java.util.Set;
 
 /**

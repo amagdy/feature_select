@@ -1,0 +1,3 @@
+[submodule "repos/a1works_java_common"]
+	path = repos/a1works_java_common
+	url = git@github.com:amagdy/a1works_java_commons.git
