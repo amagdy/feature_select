@@ -1,5 +1,8 @@
 package com.a1works.featureSelection;
 
+import com.a1works.featureSelection.Feature;
+import com.a1works.featureSelection.MlClass;
+
 import java.util.Set;
 
 /**

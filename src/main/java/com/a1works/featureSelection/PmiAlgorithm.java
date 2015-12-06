@@ -17,17 +17,41 @@ public final class PmiAlgorithm implements FeatureSelectionAlgorithm {
         return Math.log(_num) / Math.log(2);
     }
 
+
+    private double getProbability(long frequency) {
+        return (double)frequency / (double)input.getRecordsCount();
+    }
+
+    private double getProbabilityOfFeature(Feature feature){
+        return getProbability(input.getFeatureFrequency(feature));
+    }
+
+    private double getProbabilityOfMlClass(MlClass cls){
+        return getProbability(input.getMlClassFrequency(cls));
+    }
+
+    private double getProbabilityOfFeatureAndMlClass(Feature feature, MlClass cls){
+        return getProbability(input.getFeatureFrequencyPerClass(feature, cls));
+    }
+
+    private double getProbabilityOfMlClassGivenFeature(MlClass cls, Feature feature) {
+        return getProbabilityOfFeatureAndMlClass(feature, cls) / getProbabilityOfFeature(feature);
+    }
+
+    private double getProbabilityOfFeatureGivenMlClass(Feature feature, MlClass cls) {
+        return getProbabilityOfFeatureAndMlClass(feature, cls) / getProbabilityOfMlClass(cls);
+    }
+
     private ScoredFeature pmiOfFeatureForAllClasses(Feature feature) {
         // PMI(f) = sum<all_classes>(P(f,c) * Log2(P(f|c) / P(f)))
-        ProbabilityCalculator prob = ProbabilityCalculator.createInstance(input);
         double sum = 0.0;
         for (MlClass cls : input.getMlClasses()) {
             sum +=
-                    prob.getProbabilityOfFeatureAndMlClass(feature, cls)            // P(f, c)
+                    getProbabilityOfFeatureAndMlClass(feature, cls)            // P(f, c)
                     * log2(
-                            prob.getProbabilityOfFeatureGivenMlClass(feature, cls)  // P(f | c)
+                            getProbabilityOfFeatureGivenMlClass(feature, cls)  // P(f | c)
                             /
-                            prob.getProbabilityOfFeature(feature)                   // P(f)
+                            getProbabilityOfFeature(feature)                   // P(f)
                     );
         }
         return new ScoredFeature(feature, sum);

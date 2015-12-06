@@ -2,13 +2,8 @@ package com.a1works.featureSelection;
 
 import static org.junit.Assert.*;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
 import java.util.SortedSet;
 
 /**
@@ -29,7 +24,7 @@ public class PmiAlgorithmTest {
             "0 1:1 4:1 14:1";
 
     private FeatureSelectionInput getInputFromString(String data){
-        return StringFeatureSelectionInput.createInstance(data);
+        return StringFeatureSelectionInputBuilder.createInstance(data);
     }
 
 

@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by Ahmed Magdy Ezzeldin <a.magdy@a1works.com> on 25/10/15.
  */
-final class Frequency<E extends Event> {
+public final class Frequency<E extends Event> {
     private E event;
     private AtomicLong frequency;
 

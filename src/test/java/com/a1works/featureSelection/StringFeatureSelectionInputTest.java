@@ -14,7 +14,7 @@ public class StringFeatureSelectionInputTest {
     @Test
     public void givenOneLineWhenParseThenItShouldWork(){
         MlClass cls = MlClass.getInstance("1");
-        FeatureSelectionInput target = StringFeatureSelectionInput.createInstance("1 1:1 2:1 3:1");
+        FeatureSelectionInput target = StringFeatureSelectionInputBuilder.createInstance("1 1:1 2:1 3:1");
         assertEquals("Number of records must be 1.", 1, target.getRecordsCount());
         Set<MlClass> classes = target.getMlClasses();
         assertEquals("Number of classes must be 1.", 1, classes.size());
@@ -24,7 +24,7 @@ public class StringFeatureSelectionInputTest {
 
     @Test
     public void given10LinesWhenParseThenItShouldWork(){
-        FeatureSelectionInput target = StringFeatureSelectionInput.createInstance(
+        FeatureSelectionInput target = StringFeatureSelectionInputBuilder.createInstance(
                 "1 1:1 2:1 3:1 5:1\n" +
                 "1 1:1 3:1 6:1\n" +
                 "1 1:1 2:1 3:1 7:1\n" +
@@ -42,13 +42,13 @@ public class StringFeatureSelectionInputTest {
 
     @Test(expected = InvalidRecordFormatException.class)
     public void givenInvalidStringWhenParseThenThrowException(){
-        FeatureSelectionInput target = StringFeatureSelectionInput.createInstance("dsdsdsdsddsds");
+        FeatureSelectionInput target = StringFeatureSelectionInputBuilder.createInstance("dsdsdsdsddsds");
 
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void givenNullStringWhenParseThenThrowException(){
-        FeatureSelectionInput target = StringFeatureSelectionInput.createInstance(null);
+        FeatureSelectionInput target = StringFeatureSelectionInputBuilder.createInstance(null);
 
     }
 
