@@ -7,7 +7,7 @@ import java.util.Set;
  */
 public class DefaultFeatureSelectionRecordProcessor implements FeatureSelectionRecordProcessor {
     @Override
-    public Record extractRecord(String recordStr) throws InvaidFeatureSelectionRecordException {
+    public Record extractRecord(String recordStr) throws InvalidRecordFormatException {
         return null;
     }
 
@@ -51,6 +51,11 @@ public class DefaultFeatureSelectionRecordProcessor implements FeatureSelectionR
         @Override
         public long getRecordsCount() {
             return 0;
+        }
+
+        @Override
+        public Set<Feature> getMlClassFeatures(MlClass cls) {
+            return null;
         }
     }
 }

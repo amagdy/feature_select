@@ -22,4 +22,6 @@ public interface FeatureSelectionInput {
 
     public long getRecordsCount();
 
+    public Set<Feature> getMlClassFeatures(MlClass cls);
+
 }

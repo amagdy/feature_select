@@ -10,6 +10,6 @@ import java.util.Set;
 public interface Record {
 
     public MlClass getMlClass();
-    public Set<Feature> getFeatures();
+    public Set<Frequency<Feature>> getFeatures();
 
 }

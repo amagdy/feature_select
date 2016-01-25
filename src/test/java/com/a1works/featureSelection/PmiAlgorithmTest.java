@@ -24,7 +24,7 @@ public class PmiAlgorithmTest {
             "0 1:1 4:1 14:1";
 
     private FeatureSelectionInput getInputFromString(String data){
-        return StringFeatureSelectionInputBuilder.createInstance(data);
+        return StringFeatureSelectionInputBuilder.createInstance(data).build();
     }
 
 

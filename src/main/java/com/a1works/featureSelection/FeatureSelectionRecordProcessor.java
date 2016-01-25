@@ -5,7 +5,7 @@ package com.a1works.featureSelection;
  */
 public interface FeatureSelectionRecordProcessor {
 
-    Record extractRecord(String recordStr) throws InvaidFeatureSelectionRecordException;
+    Record extractRecord(String recordStr) throws InvalidRecordFormatException;
 
     FeatureSelectionInput mergeInputs(FeatureSelectionInput... inputs);
 }
