@@ -2,12 +2,8 @@ package com.a1works.featureSelection;
 
 import com.a1works.commons.EqualsBuilder;
 import com.a1works.commons.HashcodeBuilder;
-
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * Created by Ahmed Magdy Ezzeldin <a.magdy@a1works.com> on 25/10/15.
- */
 public final class Frequency<E extends Event> {
     private E event;
     private AtomicLong frequency;

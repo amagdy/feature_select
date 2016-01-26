@@ -4,9 +4,6 @@ package com.a1works.featureSelection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-/**
- * Created by Ahmed Magdy <ahmed_magdy@epam.com> on 18.10.15.
- */
 public final class PmiAlgorithm implements FeatureSelectionAlgorithm {
 
     private FeatureSelectionInput input;

@@ -3,9 +3,6 @@ package com.a1works.featureSelection;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- * Created by Ahmed Magdy <ahmed_magdy@epam.com> on 18.10.15.
- */
 public class ApplicationTest {
 
     @Test

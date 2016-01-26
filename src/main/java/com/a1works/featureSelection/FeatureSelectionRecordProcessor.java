@@ -3,9 +3,8 @@ package com.a1works.featureSelection;
 /**
  * Created by Ahmed_Magdy on 12/6/15.
  */
-public interface FeatureSelectionRecordProcessor {
+public interface FeatureSelectionRecordProcessor<T> {
 
-    Record extractRecord(String recordStr) throws InvalidRecordFormatException;
+    Iterable<Record> getRecords(T input) throws InvalidRecordFormatException;
 
-    FeatureSelectionInput mergeInputs(FeatureSelectionInput... inputs);
 }

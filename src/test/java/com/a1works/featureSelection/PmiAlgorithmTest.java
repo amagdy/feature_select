@@ -6,9 +6,6 @@ import org.junit.Test;
 
 import java.util.SortedSet;
 
-/**
- * Created by Ahmed Magdy <ahmed_magdy@epam.com> on 18.10.15.
- */
 public class PmiAlgorithmTest {
 
     private static final int CORRECT_ALL_RECORDS_COUNT = 10;
@@ -24,7 +21,7 @@ public class PmiAlgorithmTest {
             "0 1:1 4:1 14:1";
 
     private FeatureSelectionInput getInputFromString(String data){
-        return StringFeatureSelectionInputBuilder.createInstance(data).build();
+        return FeatureSelectionInputBuilder.createInstance(data, new StringFeatureSelectionRecordProcessor()).build();
     }
 
 

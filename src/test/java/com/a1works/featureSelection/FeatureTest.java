@@ -2,9 +2,7 @@ package com.a1works.featureSelection;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-/**
- * Created by Ahmed Magdy Ezzeldin <a.magdy@a1works.com> on 2/11/15.
- */
+
 public class FeatureTest {
 
     @Test
