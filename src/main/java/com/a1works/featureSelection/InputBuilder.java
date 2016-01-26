@@ -5,16 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class FeatureSelectionInputBuilder<T> {
+public class InputBuilder<T> {
 
     private T input;
-    private FeatureSelectionRecordProcessor<T> recordProcessor;
+    private RecordProcessor<T> recordProcessor;
 
-    public static <T> FeatureSelectionInputBuilder<T> createInstance(T rawInput,
-                                                                     FeatureSelectionRecordProcessor<T> processor) {
+    public static <T> InputBuilder<T> createInstance(T rawInput,
+                                                                     RecordProcessor<T> processor) {
         if (rawInput == null)
             throw new IllegalArgumentException("input cannot be null.");
-        FeatureSelectionInputBuilder builder = new FeatureSelectionInputBuilder();
+        InputBuilder builder = new InputBuilder();
 
         builder.recordProcessor = processor;
         builder.input = rawInput;
@@ -22,24 +22,8 @@ public class FeatureSelectionInputBuilder<T> {
         return builder;
     }
 
-    public FeatureSelectionInput mergeInputs(FeatureSelectionInput input1,
-                                             FeatureSelectionInput input2,
-                                             FeatureSelectionInput... inputs) {
-        if (input1 == null || input2 == null) {
-            throw new IllegalArgumentException("Please provide at least 2 inputs");
-        }
-        DefaultFeatureSelectionInput accumulator = new DefaultFeatureSelectionInput(input1);
-        accumulator.appendFeatureSelectionInput(input2);
-        if (inputs != null && inputs.length > 0) {
-            for (FeatureSelectionInput input : inputs) {
-                accumulator.appendFeatureSelectionInput(input);
-            }
-        }
-        return accumulator;
-    }
-
-    public FeatureSelectionInput build() {
-        DefaultFeatureSelectionInput instance = new DefaultFeatureSelectionInput();
+    public Input build() {
+        DefaultInput instance = new DefaultInput();
         Iterable<Record> records = recordProcessor.getRecords(input);
         for (Record record : records) {
             instance.appendRecord(record);
@@ -47,32 +31,17 @@ public class FeatureSelectionInputBuilder<T> {
         return instance;
     }
 
-    private static class DefaultFeatureSelectionInput implements FeatureSelectionInput {
+    private static class DefaultInput implements Input {
 
         private Map<Feature, Frequency<Feature>> featuresFrequencies = new HashMap<>();
         private Map<MlClass, Map<Feature, Frequency<Feature>>> featureFrequencyPerClass = new HashMap<>();
         private Map<MlClass, Frequency<MlClass>> classesFrequencies = new HashMap<>();
         private long numberOfAllRecords = 0;
 
-        private DefaultFeatureSelectionInput() {
+        private DefaultInput() {
             featuresFrequencies = new HashMap<>();
             classesFrequencies = new HashMap<>();
             featureFrequencyPerClass = new HashMap<>();
-        }
-
-        private DefaultFeatureSelectionInput(FeatureSelectionInput input) {
-            this();
-            for (MlClass cls : input.getMlClasses()){
-                classesFrequencies.put(cls, new Frequency<MlClass>(cls, input.getMlClassFrequency(cls)));
-                Map<Feature, Frequency<Feature>> mapMlClassFeaturesFreq = new HashMap<>();
-                featureFrequencyPerClass.put(cls, mapMlClassFeaturesFreq);
-                for (Feature feature : input.getMlClassFeatures(cls)) {
-                    mapMlClassFeaturesFreq.put(feature, new Frequency<Feature>(feature, input.getFeatureFrequencyPerClass(feature, cls)));
-                }
-            }
-            for (Feature feature : input.getFeatures()) {
-                featuresFrequencies.put(feature, new Frequency<Feature>(feature, input.getFeatureFrequency(feature)));
-            }
         }
 
         @Override
@@ -128,20 +97,6 @@ public class FeatureSelectionInputBuilder<T> {
                 addFeatureToClass(cls, feature, freq);
             }
             numberOfAllRecords++;
-        }
-
-        private void appendFeatureSelectionInput(FeatureSelectionInput input) {
-            for (Feature feature : input.getFeatures()) {
-                addFeature(feature, input.getFeatureFrequency(feature));
-            }
-            for (MlClass cls : input.getMlClasses()) {
-                incrementClassFrequency(cls, input.getMlClassFrequency(cls));
-                Set<Feature> classFeatures = input.getMlClassFeatures(cls);
-                for (Feature feature : classFeatures) {
-                    addFeatureToClass(cls, feature, input.getFeatureFrequencyPerClass(feature, cls));
-                }
-            }
-            numberOfAllRecords += input.getRecordsCount();
         }
 
         private void incrementClassFrequency(MlClass cls, long frequency){

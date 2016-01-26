@@ -4,9 +4,9 @@ package com.a1works.featureSelection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-public final class PmiAlgorithm implements FeatureSelectionAlgorithm {
+public final class PmiAlgorithm implements Algorithm {
 
-    private FeatureSelectionInput input;
+    private Input input;
 
 
     private double log2(double _num) {
@@ -55,7 +55,7 @@ public final class PmiAlgorithm implements FeatureSelectionAlgorithm {
     }
 
     @Override
-    public SortedSet<ScoredFeature> scoreFeatures(final FeatureSelectionInput input) {
+    public SortedSet<ScoredFeature> scoreFeatures(final Input input) {
         this.input = input;
         SortedSet<ScoredFeature> scores = new TreeSet<>();
         for (Feature feature: input.getFeatures()) {

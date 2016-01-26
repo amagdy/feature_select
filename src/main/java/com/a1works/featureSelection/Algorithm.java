@@ -5,8 +5,8 @@ import java.util.SortedSet;
 /**
  * Created by Ahmed Magdy <ahmed_magdy@epam.com> on 18.10.15.
  */
-public interface FeatureSelectionAlgorithm {
+public interface Algorithm {
 
-    public SortedSet<ScoredFeature> scoreFeatures(FeatureSelectionInput input);
+    public SortedSet<ScoredFeature> scoreFeatures(Input input);
 
 }

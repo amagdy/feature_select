@@ -3,15 +3,11 @@ package com.a1works.featureSelection;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by Ahmed Magdy <ahmed_magdy@epam.com> on 18.10.15.
- */
-public class StringFeatureSelectionRecordProcessorTest {
+public class StringRecordProcessorTest {
 
     private List<Record> recordsIterableToList(Iterable<Record> records){
         List<Record> list = new ArrayList<>();
@@ -24,7 +20,7 @@ public class StringFeatureSelectionRecordProcessorTest {
     @Test
     public void givenOneLineWhenParseThenItShouldWork(){
         MlClass cls = MlClass.getInstance("1");
-        StringFeatureSelectionRecordProcessor stringProcessor = new StringFeatureSelectionRecordProcessor();
+        StringRecordProcessor stringProcessor = new StringRecordProcessor();
         List<Record> records = recordsIterableToList(stringProcessor.getRecords("1 1:1 2:1 3:1"));
         assertEquals("Number of records must be 1.", 1, records.size());
         Record record = records.get(0);
@@ -35,7 +31,7 @@ public class StringFeatureSelectionRecordProcessorTest {
     @Test
     public void given10LinesWhenParseThenItShouldWork(){
         MlClass cls = MlClass.getInstance("1");
-        StringFeatureSelectionRecordProcessor stringProcessor = new StringFeatureSelectionRecordProcessor();
+        StringRecordProcessor stringProcessor = new StringRecordProcessor();
         List<Record> records = recordsIterableToList(stringProcessor.getRecords(
                 "1 1:1 2:1 3:1 5:1\n" +
                 "1 1:1 3:1 6:1\n" +
@@ -52,13 +48,13 @@ public class StringFeatureSelectionRecordProcessorTest {
 
     @Test(expected = InvalidRecordFormatException.class)
     public void givenInvalidStringWhenParseThenThrowException(){
-        StringFeatureSelectionRecordProcessor stringProcessor = new StringFeatureSelectionRecordProcessor();
+        StringRecordProcessor stringProcessor = new StringRecordProcessor();
         stringProcessor.getRecords("dsdsdsdsddsds");
     }
 
     @Test(expected = InvalidRecordFormatException.class)
     public void givenNullStringWhenParseThenThrowException(){
-        StringFeatureSelectionRecordProcessor stringProcessor = new StringFeatureSelectionRecordProcessor();
+        StringRecordProcessor stringProcessor = new StringRecordProcessor();
         stringProcessor.getRecords(null);
     }
 

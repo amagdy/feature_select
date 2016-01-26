@@ -20,14 +20,14 @@ public class PmiAlgorithmTest {
             "0 1:1 2:1 4:1 13:1\n" +
             "0 1:1 4:1 14:1";
 
-    private FeatureSelectionInput getInputFromString(String data){
-        return FeatureSelectionInputBuilder.createInstance(data, new StringFeatureSelectionRecordProcessor()).build();
+    private Input getInputFromString(String data){
+        return InputBuilder.createInstance(data, new StringRecordProcessor()).build();
     }
 
 
     @Test
     public void checkIfPmiCalculatesCorrectResultsForCorrectData(){
-        FeatureSelectionAlgorithm target = new PmiAlgorithm();
+        Algorithm target = new PmiAlgorithm();
         SortedSet<ScoredFeature> featuresScores = target.scoreFeatures(getInputFromString(INPUT_SMALL_DATA));
         assertNotNull("Features scores cannot be Null.", featuresScores);
     }

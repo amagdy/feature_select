@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public class StringFeatureSelectionRecordProcessor implements FeatureSelectionRecordProcessor<String> {
+public class StringRecordProcessor implements RecordProcessor<String> {
     private static final String STR_PATTERN = "^[a-zA-Z0-9_-]+( +[a-zA-Z0-9_-]+:[0-9]+)+$";
     private static final Pattern RECORD_PATTERN = Pattern.compile(STR_PATTERN);
 
@@ -29,18 +29,19 @@ public class StringFeatureSelectionRecordProcessor implements FeatureSelectionRe
             throw new InvalidRecordFormatException("Record cannot be null");
         }
         List<Record> records = null;
-        String[] arrRecords = input.split(" *\r?\n *");
+        String[] arrRecords = input.split(" *(\r\n|\n|\r) *");
         for (String strRecord : arrRecords) {
             strRecord = sanitizeRecordFormat(strRecord);
             String[] recordParts = strRecord.split(" +");
             MlClass cls = MlClass.getInstance(recordParts[0]);
-            DefaultRecord record = new DefaultRecord(cls);
+            Map<Feature, Long> featuresFrequencies = new HashMap<>(recordParts.length-1);
             for (int i = 1; i < recordParts.length; i++) {
                 String[] featureAndFreq = recordParts[i].split(":");
                 Feature feature = Feature.getInstance(featureAndFreq[0]);
                 long freq = Long.parseLong(featureAndFreq[1]);
-                record.addFeature(feature, freq);
+                featuresFrequencies.put(feature, freq);
             }
+            DefaultRecord record = new DefaultRecord(cls, featuresFrequencies);
             if (records == null) {
                 records = new LinkedList<>();
             }
@@ -50,35 +51,6 @@ public class StringFeatureSelectionRecordProcessor implements FeatureSelectionRe
             return Collections.EMPTY_LIST;
         } else {
             return Collections.unmodifiableList(records);
-        }
-    }
-
-    private static class DefaultRecord implements Record {
-        private MlClass cls;
-        private Map<Feature, Long> featuresFrequencies;
-
-        private DefaultRecord(MlClass _cls){
-            cls = _cls;
-            featuresFrequencies = new HashMap<>();
-        }
-
-        private void addFeature(Feature feature, long frequency){
-            featuresFrequencies.put(feature, frequency);
-        }
-
-        @Override
-        public MlClass getMlClass() {
-            return cls;
-        }
-
-        @Override
-        public Set<Feature> getFeatures() {
-            return Collections.unmodifiableSet(featuresFrequencies.keySet());
-        }
-
-        @Override
-        public long getFeatureFrequency(Feature feature) {
-            return featuresFrequencies.get(feature).longValue();
         }
     }
 }

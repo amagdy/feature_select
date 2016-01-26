@@ -5,10 +5,10 @@ package com.a1works.featureSelection;
  */
 public interface Configuration {
 
-    FeatureSelectionRecordProcessor getRecordProcessor();
+    RecordProcessor getRecordProcessor();
 
-    FeatureSelectionInputBuilder getFeatureSelectionInputBuilder();
+    InputBuilder getInputBuilder();
 
-    FeatureSelectionAlgorithm getFeatureSelectionAlgorithm();
+    Algorithm getAlgorithm();
     
 }

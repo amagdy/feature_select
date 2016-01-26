@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * Created by Ahmed Magdy <ahmed_magdy@epam.com> on 18.10.15.
  */
-public interface FeatureSelectionInput {
+public interface Input {
 
     public Set<Feature> getFeatures();
 
