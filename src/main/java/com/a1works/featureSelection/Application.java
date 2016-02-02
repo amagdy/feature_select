@@ -1,5 +1,7 @@
 package com.a1works.featureSelection;
 
+import java.io.BufferedReader;
+
 public final class Application implements Runnable {
 
     private volatile boolean isAppRunning = false;
@@ -20,6 +22,7 @@ public final class Application implements Runnable {
     public void run(){
         isAppRunning = true;
         //////TODO
+
     }
 
     public boolean isRunning(){
