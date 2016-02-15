@@ -6,9 +6,8 @@ import com.a1works.featureSelection.Record;
 /**
  * Created by magdy on 02.02.16.
  */
-public interface ChunkHandler {
-
+public interface ChunkHandler<E> {
     void processLine(String line);
-    void finished();
+    E finished();
     void error(Exception ex);
 }

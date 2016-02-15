@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -14,17 +16,24 @@ import java.util.concurrent.Executors;
  * Creates a thread pool where every thread reads a chunk of a big file in parallel.
  * Every chunk is read in lines
  */
-public class ParallelFileProcessor implements Runnable {
+public class ParallelFileProcessor<T, E> {
     private int threadsCount = 0;
-    List<Runnable> tasks;
+    private List<Runnable> tasks;
+    private CountDownLatch countdownLatch;
+    private Callable<E> callback;
 
-    public static ParallelFileProcessor getInstance(File file, Collection<? extends ChunkHandler> chunkHandlers) {
+    public ParallelFileProcessor (File file, Collection<ChunkHandler<E>> chunkHandlers, Callable<T> callback) {
         List<Runnable> tasks = generateTasks(file, chunkHandlers);
-        ParallelFileProcessor instance = new ParallelFileProcessor(chunkHandlers.size(), tasks);
-        return instance;
+        this.threadsCount = chunkHandlers.size();
+        this.tasks = tasks;
+        this.countdownLatch = new CountDownLatch(threadsCount);
     }
 
-    public static ParallelFileProcessor getInstance(int threadsCount, File file, Class<? extends ChunkHandler> cls) {
+    public ParallelFileProcessor(File file, Collection<ChunkHandler<E>> chunkHandlers) {
+
+    }
+
+    public ParallelFileProcessor(int threadsCount, File file, Class<ChunkHandler<E>> cls) {
         List<ChunkHandler> chunkHandlers = new ArrayList<>(threadsCount);
         for (int i = 0; i < threadsCount; i++) {
             try {
@@ -33,22 +42,32 @@ public class ParallelFileProcessor implements Runnable {
                 throw new RuntimeException(ex);
             }
         }
-        return getInstance(file, chunkHandlers);
+        this(file, chunkHandlers);
     }
 
-    public static ParallelFileProcessor getInstance(int threadsCount, File file, ChunkHandler handler) {
+    public ParallelFileProcessor(int threadsCount, File file, ChunkHandler handler) {
         List<ChunkHandler> chunkHandlers = new ArrayList<>(threadsCount);
         for (int i = 0; i < threadsCount; i++) {
             chunkHandlers.add(handler);
         }
-        return getInstance(file, chunkHandlers);
+        this(file, chunkHandlers);
     }
 
+    private void start() {
+        ExecutorService executor = Executors.newFixedThreadPool(threadsCount);
+        for (Runnable task : tasks) {
+            executor.execute(task);
+        }
+        executor.shutdown();
+        while (!executor.isTerminated()) {
+            try {
+                this.wait(200);
+            } catch (InterruptedException e) {
 
-    private ParallelFileProcessor(int threadsCount, List<Runnable> tasks){
-        this.threadsCount = threadsCount;
-        this.tasks = tasks;
+            }
+        }
     }
+
 
     private static List<Runnable> generateTasks(File file, Collection<? extends ChunkHandler> chunkHandlers) {
         int threadCount = chunkHandlers.size();
@@ -76,21 +95,7 @@ public class ParallelFileProcessor implements Runnable {
         return tasks;
     }
 
-    @Override
-    public void run() {
-        ExecutorService executor = Executors.newFixedThreadPool(threadsCount);
-        for (Runnable task : tasks) {
-            executor.execute(task);
-        }
-        executor.shutdown();
-        while (!executor.isTerminated()) {
-            try {
-                this.wait(200);
-            } catch (InterruptedException e) {
 
-            }
-        }
-    }
 
     private static class Task implements Runnable {
         private long start, chunkSize;
@@ -120,6 +125,7 @@ public class ParallelFileProcessor implements Runnable {
             }
             return bufferedReader;
         }
+
 
         @Override
         public void run() {
