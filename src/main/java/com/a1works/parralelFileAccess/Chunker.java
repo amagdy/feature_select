@@ -1,35 +1,35 @@
 package com.a1works.parralelFileAccess;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.Iterator;
 
-public class Chunker implements Iterable<ChunkReader> {
+public class Chunker {
 
     private int chunksCount;
-    private File file;
+    private Reader reader;
     private long chunkSize;
 
-    public static Chunker getInstance(File file, int chunksCount){
-        return new Chunker(file, chunksCount);
+    public static Chunker getInstance(Reader reader, int chunksCount, long chunkSize){
+        return new Chunker(reader, chunksCount, chunkSize);
     }
 
-    private Chunker(File file, int chunksCount){
-        this.file = file;
+    private Chunker(Reader reader, int chunksCount, long chunkSize){
+        this.reader = reader;
         this.chunksCount = chunksCount;
-        this.chunkSize = (long)Math.ceil((double)file.length() / (double)chunksCount);
+        this.chunkSize = chunkSize;
     }
 
     private static class ChunkReadersIterator implements Iterator<ChunkReader> {
         private int chunksCount;
-        private File file;
+        private Reader reader;
         private long chunkSize;
         private int nextChunkIndex = 0;
 
-        private ChunkReadersIterator(File file, int chunksCount, long chunkSize){
-            this.file = file;
+        private ChunkReadersIterator(Reader reader, int chunksCount, long chunkSize){
+            this.reader = reader;
             this.chunksCount = chunksCount;
             this.chunkSize = chunkSize;
         }
@@ -42,9 +42,9 @@ public class Chunker implements Iterable<ChunkReader> {
         @Override
         public ChunkReader next() {
             if (!this.hasNext()) return null;
-            ChunkReader reader = new DefaultChunkReader(nextChunkIndex, chunkSize, file);
+            ChunkReader chunkReader = new DefaultChunkReader(nextChunkIndex, chunkSize, reader);
             nextChunkIndex++;
-            return reader;
+            return chunkReader;
         }
 
         @Override
@@ -53,9 +53,17 @@ public class Chunker implements Iterable<ChunkReader> {
         }
     };
 
-    @Override
-    public Iterator<ChunkReader> iterator() {
-        return new ChunkReadersIterator(file, chunksCount, chunkSize);
+    public int getChunksCount(){
+        return chunksCount;
+    }
+
+    public Iterable<ChunkReader> readers() {
+        return new Iterable<ChunkReader>() {
+            @Override
+            public Iterator<ChunkReader> iterator() {
+                return new ChunkReadersIterator(reader, chunksCount, chunkSize);
+            }
+        };
     }
 
 
@@ -67,12 +75,12 @@ public class Chunker implements Iterable<ChunkReader> {
         private BufferedReader bufferedReader;
         private long readBytesCount;
 
-        private DefaultChunkReader(int chunkIndex, long chunkSize, File file){
+        private DefaultChunkReader(int chunkIndex, long chunkSize, Reader reader){
             this.chunkIndex = chunkIndex;
             this.chunkSize = chunkSize;
             long start = chunkIndex * chunkSize;
             try {
-                this.bufferedReader = getChunkReaderSetOnFirstCompleteLine(file, start);
+                this.bufferedReader = getChunkReaderSetOnFirstCompleteLine(reader, start);
                 this.canRead = true;
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
@@ -83,21 +91,21 @@ public class Chunker implements Iterable<ChunkReader> {
             return (readChar == 13 || readChar == 10);
         }
 
-        private BufferedReader getChunkReaderSetOnFirstCompleteLine(File file, long start) throws IOException {
-            FileReader fileReader = new FileReader(file);
+        private BufferedReader getChunkReaderSetOnFirstCompleteLine(Reader reader, long start) throws IOException {
             BufferedReader bufferedReader;
             if (start > 0) {    // if this is not the first chunk
-                fileReader.skip(start);
-                bufferedReader = new BufferedReader(fileReader);
+                reader.skip(start);
+                bufferedReader = new BufferedReader(reader);
                 // if the last character of the previous chunk is not a newline character
                 if (!isNewLine(bufferedReader.read())) {
                     // skip the rest of the line
                     String line = bufferedReader.readLine();
-                    if (line == null) throw new RuntimeException("Empty Chunk");
-                    readBytesCount += line.length();
+                    System.out.println("----> " + line);
+                    if (line != null) //throw new RuntimeException("Empty Chunk");
+                        readBytesCount += line.length();
                 }
             } else {
-                bufferedReader = new BufferedReader(fileReader);
+                bufferedReader = new BufferedReader(reader);
             }
             return bufferedReader;
         }
